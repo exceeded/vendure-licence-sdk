@@ -1,0 +1,22 @@
+HULO Global Limited — Commercial Plugin Licence
+
+Copyright (c) 2026 HULO Global Limited (Companies House registration in
+England and Wales). All rights reserved.
+
+This package contains licence-verification code shared by the
+@hulo/vendure-plugin-* family of Vendure plugins. The package may be
+installed and used only in conjunction with a paid HULO Vendure plugin
+that depends on it. Redistribution of the package outside of that
+context is not permitted.
+
+The source code is published only to allow customers to audit the
+verification logic for the plugins they have purchased. Modification,
+reverse engineering of the licence-signing keys, or use of this package
+to circumvent licence verification in any HULO product is expressly
+prohibited.
+
+No warranty is given. To the maximum extent permitted by law, HULO
+Global Limited disclaims all liability arising from use of this
+software.
+
+For commercial licensing enquiries, contact: sales@eliteenterprisesoftware.com
