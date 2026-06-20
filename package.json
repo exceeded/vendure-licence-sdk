@@ -1,6 +1,6 @@
 {
     "name": "@huloglobal/vendure-licence-sdk",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Licence validation helpers for HULO Vendure plugins. JWT verification, revocation polling and an admin status check used by paid HULO plugins to confirm the host installation is licensed.",
     "license": "SEE LICENSE IN LICENSE",
     "author": "Wayne Garrison <wayne@garrison.me.uk>",

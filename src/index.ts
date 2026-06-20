@@ -22,3 +22,4 @@
 export { verifyLicence } from './verify';
 export { LicenceStatus, LicencePayload, VerifyLicenceOptions } from './types';
 export { RevocationChecker } from './revocation';
+export { UpdateChecker, UpdateStatus } from './update-check';
