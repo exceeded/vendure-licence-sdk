@@ -1,5 +1,5 @@
 /**
- * @hulo/vendure-licence-sdk
+ * @huloglobal/vendure-licence-sdk
  *
  * Licence-key validation helpers shared by every commercial HULO
  * Vendure plugin. Each plugin embeds the SDK and calls

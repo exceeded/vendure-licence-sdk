@@ -1,4 +1,4 @@
-# @hulo/vendure-licence-sdk
+# @huloglobal/vendure-licence-sdk
 
 Licence-key verification helpers shared by every commercial HULO Vendure plugin.
 
@@ -9,13 +9,13 @@ constant in the plugin source, and call `verifyLicence(...)` once at boot.
 ## Install
 
 ```bash
-yarn add @hulo/vendure-licence-sdk
+yarn add @huloglobal/vendure-licence-sdk
 ```
 
 ## Usage in a plugin
 
 ```ts
-import { verifyLicence, RevocationChecker } from '@hulo/vendure-licence-sdk';
+import { verifyLicence, RevocationChecker } from '@huloglobal/vendure-licence-sdk';
 import { VendurePlugin } from '@vendure/core';
 
 const HULO_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----

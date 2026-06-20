@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@hulo/vendure-licence-sdk` are documented here. The
+All notable changes to `@huloglobal/vendure-licence-sdk` are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
