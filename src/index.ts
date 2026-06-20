@@ -23,3 +23,15 @@ export { verifyLicence } from './verify';
 export { LicenceStatus, LicencePayload, VerifyLicenceOptions } from './types';
 export { RevocationChecker } from './revocation';
 export { UpdateChecker, UpdateStatus } from './update-check';
+export {
+    verifyHmacSha256,
+    signValue,
+    verifySignedValue,
+    RateLimiter,
+    RateLimiterOptions,
+    applySecurityHeaders,
+    isUrlOnAllowlist,
+    hashIp,
+    randomToken,
+} from './security';
+export { startRetentionSweeper, RetentionOptions } from './retention';
