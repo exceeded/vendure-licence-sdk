@@ -4,6 +4,12 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here. Th
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1]
+
+### Changed
+- Comprehensive README refresh — documents every shipped helper with
+  copy-paste examples (boot, rate limiting + retention, webhook HMAC).
+
 ## [0.3.0]
 
 ### Added
