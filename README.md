@@ -1,10 +1,12 @@
 # @huloglobal/vendure-licence-sdk
 
-Licence-key verification helpers shared by every commercial HULO Vendure plugin.
+Shared runtime utilities used by every commercial HULO Vendure plugin.
 
-The SDK is consumed by plugins, not by Vendure storefronts directly. Install it
-as a runtime dependency of your plugin package, embed your `publicKey`
-constant in the plugin source, and call `verifyLicence(...)` once at boot.
+Consumed by plugins, not by Vendure storefronts directly. Install it as a
+runtime dependency of your plugin package, embed your `publicKey` constant
+in the plugin source, and wire the helpers in your plugin's `init()`.
+
+Maintained by Wayne Garrison.
 
 ## Install
 
@@ -12,64 +14,135 @@ constant in the plugin source, and call `verifyLicence(...)` once at boot.
 yarn add @huloglobal/vendure-licence-sdk
 ```
 
-## Usage in a plugin
+## What's in the box
+
+| Helper | Purpose |
+| --- | --- |
+| `verifyLicence(opts)` | Offline RSA-SHA256 JWT verification. No boot-time network call required — Vendure stays bootable even when the licence server is unreachable. |
+| `RevocationChecker` | Weekly poll of `revoked.json` with soft-fail caching. Each plugin instantiates one at boot. |
+| `UpdateChecker` | 24-hour poll of the npm registry for the package's latest version. Surfaced via the plugin's `/status` endpoint so the admin UI can show an "update available" banner. |
+| `startRetentionSweeper({...})` | Daily DELETE-by-age sweeper for log tables. Opt-in via the plugin's `options.retention`. |
+| `verifyHmacSha256(body, sig, secret)` | Timing-safe HMAC-SHA256 verification for webhooks. Tolerates the GitHub-style `sha256=` prefix. |
+| `signValue(value, secret)` / `verifySignedValue(signed, secret)` | HMAC-tag any string. Used to seal cookies, query parameters and webhook payloads. |
+| `RateLimiter` | Token-bucket rate limiter with an LRU-capped keyspace so a flood of keys can't grow memory. |
+| `applySecurityHeaders(res, {strict})` | Recommended baseline of security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Resource-Policy`). `strict` adds a tight CSP for JSON / API endpoints. |
+| `isUrlOnAllowlist(url, allowed)` | Defends click redirectors from being abused as open redirectors. Wildcard suffixes (`*.example.com`) supported. |
+| `hashIp(ip, salt)` | SHA-256 IP hashing with a per-install salt. Lets you keep unique-visitor counts without storing raw addresses. |
+| `randomToken(bytes)` | URL-safe random tokens for secrets / one-shot nonces. |
+
+## Minimal plugin boot example
 
 ```ts
-import { verifyLicence, RevocationChecker } from '@huloglobal/vendure-licence-sdk';
+import {
+    RevocationChecker,
+    UpdateChecker,
+    verifyLicence,
+} from '@huloglobal/vendure-licence-sdk';
 import { VendurePlugin } from '@vendure/core';
 
-const HULO_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 ... your plugin's embedded RSA public key ...
 -----END PUBLIC KEY-----`;
 
-const revocation = new RevocationChecker('https://licence.hulo-global.com/revoked.json');
-revocation.start();
+const PKG_NAME = '@youorg/your-plugin';
+const PKG_VERSION = require('../package.json').version;
 
 @VendurePlugin({ /* ... */ })
-export class MyPlugin {
-  static init(options: { licenceKey?: string }) {
-    const status = verifyLicence({
-      licenceKey: options.licenceKey,
-      pluginId: 'vendure-plugin-my-thing',
-      host: process.env.VENDURE_HOST || 'localhost',
-      publicKey: HULO_PUBLIC_KEY,
-      revokedIds: revocation.getRevokedIds(),
-    });
-    // status.valid → enable all features
-    // !status.valid → log status.message, run in unlicensed mode
-    MyPlugin.licenceStatus = status;
-    return MyPlugin;
-  }
-  static licenceStatus: LicenceStatus;
+export class YourPlugin {
+    private static revocation: RevocationChecker | null = null;
+    private static updates: UpdateChecker | null = null;
+
+    static init(opts: { licenceKey?: string; publicBaseUrl: string }) {
+        if (!YourPlugin.revocation) {
+            YourPlugin.revocation = new RevocationChecker(
+                'https://elite.charity/licence/revoked.json',
+            );
+            YourPlugin.revocation.start();
+        }
+        if (!YourPlugin.updates) {
+            YourPlugin.updates = new UpdateChecker(PKG_NAME, PKG_VERSION);
+            YourPlugin.updates.start();
+        }
+
+        const host = (opts.publicBaseUrl || '')
+            .replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        const status = verifyLicence({
+            licenceKey: opts.licenceKey,
+            pluginId: 'your-plugin',
+            host,
+            publicKey: PUBLIC_KEY,
+            revokedIds: YourPlugin.revocation.getRevokedIds(),
+        });
+        if (!status.valid) {
+            console.warn(`[${PKG_NAME}] ${status.message} — running unlicensed`);
+        }
+        return YourPlugin;
+    }
 }
 ```
 
-## Why offline JWT + periodic revocation?
+## Adding rate limiting + retention to a plugin
 
-- **Boot-time offline check.** Vendure stays bootable even when our licence
-  server is unreachable. The customer's storefront never hangs on a network call.
-- **Soft revocation.** Refunded / leaked keys are revoked by adding the JWT
-  `jti` to a flat list at `https://licence.hulo-global.com/revoked.json`. The
-  plugin re-fetches the list every 7 days.
-- **Soft failure.** Network outages keep the previous cached revocation list in
-  memory — your customer is never accidentally locked out of features they paid
-  for because our server hiccuped.
+```ts
+import {
+    applySecurityHeaders,
+    RateLimiter,
+    startRetentionSweeper,
+} from '@huloglobal/vendure-licence-sdk';
 
-## Licence status reasons
+const limiter = new RateLimiter({ capacity: 60, windowMs: 60_000 });
 
-`LicenceStatus.reason` is one of:
+@Controller('your-route')
+export class YourController implements OnApplicationBootstrap {
+    constructor(private connection: TransactionalConnection) {}
 
-| reason | meaning |
-| --- | --- |
-| `ok` | Licence verified and active. |
-| `missing` | No key supplied. Run in unlicensed mode. |
-| `malformed` | Key isn't a valid JWT. |
-| `bad-signature` | Signature didn't verify — possible tampering. |
-| `plugin-mismatch` | Licence is for a different HULO plugin. |
-| `domain-mismatch` | Host domain not in `allowedDomains`. |
-| `expired` | `exp` is in the past. |
-| `revoked` | Key appears in the revocation list. |
+    onApplicationBootstrap() {
+        startRetentionSweeper({
+            getConnection: () => this.connection.rawConnection,
+            table: 'your_log',
+            options: { days: 180, maxRows: 1_000_000 },
+            label: 'your-plugin',
+        });
+    }
+
+    @Get('public-endpoint')
+    handle(@Req() req: Request, @Res() res: Response) {
+        applySecurityHeaders(res);
+        if (!limiter.allow(`endpoint|${req.ip}`)) {
+            return res.status(429).json({ error: 'Too many requests' });
+        }
+        return res.json({ ok: true });
+    }
+}
+```
+
+## Webhook HMAC verification
+
+```ts
+import { verifyHmacSha256 } from '@huloglobal/vendure-licence-sdk';
+
+@Post('webhook')
+async webhook(@Req() req: Request, @Res() res: Response) {
+    const sig = req.headers['x-signature'] as string;
+    const raw = (req as any).rawBody || JSON.stringify((req as any).body);
+    if (!verifyHmacSha256(raw, sig, process.env.WEBHOOK_SECRET!)) {
+        return res.status(401).json({ error: 'bad signature' });
+    }
+    // ...your handler...
+    return res.json({ received: true });
+}
+```
+
+## Licence delivery
+
+HULO mints commercial licences via Stripe Checkout at
+[elite.charity/licence/buy/&lt;plugin-id&gt;](https://elite.charity).
+Keys arrive by email and are paste-in JWTs. Subscribers manage their
+plan via the Stripe Customer Portal link in the receipt email; lost
+keys can be re-sent from
+[elite.charity/licence/forgot](https://elite.charity/licence/forgot).
 
 ## Licence
 
-Commercial — see LICENSE.
+MIT for the runtime helpers in this package. The plugin code embedding
+it sells under a separate commercial licence.
