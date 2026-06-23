@@ -1,39 +1,39 @@
 {
-    "name": "@huloglobal/vendure-licence-sdk",
-    "version": "0.3.1",
-    "description": "Licence validation helpers for HULO Vendure plugins. JWT verification, revocation polling and an admin status check used by paid HULO plugins to confirm the host installation is licensed.",
-    "license": "SEE LICENSE IN LICENSE",
-    "author": "Wayne Garrison <wayne@garrison.me.uk>",
-    "homepage": "https://github.com/exceeded/vendure-licence-sdk",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/exceeded/vendure-licence-sdk.git"
-    },
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist",
-        "README.md",
-        "CHANGELOG.md",
-        "LICENSE"
-    ],
-    "scripts": {
-        "build": "tsc -p tsconfig.json",
-        "prepublishOnly": "yarn build"
-    },
-    "peerDependencies": {
-        "@vendure/core": ">=3.0.0",
-        "@nestjs/common": ">=10.0.0"
-    },
-    "devDependencies": {
-        "@nestjs/common": "^10.0.0",
-        "@vendure/core": "^3.6.0",
-        "typescript": "^5.4.0"
-    },
-    "keywords": [
-        "vendure",
-        "vendure-plugin",
-        "licence",
-        "license"
-    ]
+  "name": "@huloglobal/vendure-licence-sdk",
+  "version": "0.4.0",
+  "description": "Licence validation helpers for HULO Vendure plugins. JWT verification, revocation polling and an admin status check used by paid HULO plugins to confirm the host installation is licensed.",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Wayne Garrison <wayne@garrison.me.uk>",
+  "homepage": "https://github.com/exceeded/vendure-licence-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exceeded/vendure-licence-sdk.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "yarn build"
+  },
+  "peerDependencies": {
+    "@vendure/core": ">=3.0.0",
+    "@nestjs/common": ">=10.0.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@vendure/core": "^3.6.0",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "vendure",
+    "vendure-plugin",
+    "licence",
+    "license"
+  ]
 }
