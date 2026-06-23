@@ -28,7 +28,7 @@
   "devDependencies": {
     "@nestjs/common": "^10.0.0",
     "@vendure/core": "^3.6.0",
-    "typescript": "^5.4.0"
+    "typescript": "^6.0.3"
   },
   "keywords": [
     "vendure",
