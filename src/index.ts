@@ -35,3 +35,11 @@ export {
     randomToken,
 } from './security';
 export { startRetentionSweeper, RetentionOptions } from './retention';
+export { isLicensed, tierOf, Tier, premiumFeatureError } from './tier-gate';
+export { Heartbeat, HeartbeatOptions, fingerprintPublicKey } from './heartbeat';
+export {
+    classifyEmailEvent,
+    EventClassification,
+    ClassificationResult,
+    ClassifierInput,
+} from './email-event-classifier';
