@@ -19,16 +19,19 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "peerDependencies": {
-    "@vendure/core": ">=3.0.0",
-    "@nestjs/common": ">=10.0.0"
+    "@nestjs/common": ">=10.0.0",
+    "@vendure/core": ">=3.0.0"
   },
   "devDependencies": {
     "@nestjs/common": "^10.0.0",
     "@vendure/core": "^3.6.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.9"
   },
   "keywords": [
     "vendure",
