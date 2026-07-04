@@ -43,3 +43,7 @@ export {
     ClassificationResult,
     ClassifierInput,
 } from './email-event-classifier';
+export {
+    warnIfIncompatibleVendure,
+    isVendureVersionCompatible,
+} from './vendure-compat';
