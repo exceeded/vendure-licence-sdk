@@ -15,7 +15,8 @@
     "dist",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "logo.svg"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

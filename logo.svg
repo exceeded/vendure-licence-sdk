@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HULO Licence SDK">
+  <title>HULO Licence SDK</title>
+  <!-- HULO frame — same rounded-navy square used across every plugin
+       for brand consistency. Role-specific icon is the only element
+       that changes between plugins. -->
+  <rect width="64" height="64" rx="14" fill="#0f1419"/>
+  <!-- Shield: three-line silhouette that reads as protection at
+       small sizes. Amber (accent) outer stroke, white inner fill for
+       contrast on the dark frame. -->
+  <path d="M32 12 L46 18 V32 C46 40 40 47 32 52 C24 47 18 40 18 32 V18 Z"
+        fill="none" stroke="#f59e0b" stroke-width="3"
+        stroke-linejoin="round"/>
+  <!-- Key bow (circle) + shaft + teeth. Locked-shape reads at 20px+. -->
+  <circle cx="32" cy="26" r="4.5" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+  <path d="M32 30.5 V42 M29 38 H32 M28 34 H32"
+        fill="none" stroke="#ffffff" stroke-width="2.5"
+        stroke-linecap="round"/>
+</svg>
