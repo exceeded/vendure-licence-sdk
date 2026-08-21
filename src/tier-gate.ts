@@ -19,8 +19,13 @@
  * — clear in the admin UI, not a temporary failure.
  */
 import { LicenceStatus } from './types';
+import { EvaluationState } from './evaluation';
 
 export type Tier = 'paid' | 'free';
+
+/** Tier including the server-anchored evaluation window: 'trial' gets
+ *  the full paid feature set until the evaluation clock runs out. */
+export type EffectiveTier = 'paid' | 'trial' | 'free';
 
 export function isLicensed(status: LicenceStatus | null | undefined): boolean {
     return !!(status && status.valid);
@@ -28,6 +33,29 @@ export function isLicensed(status: LicenceStatus | null | undefined): boolean {
 
 export function tierOf(status: LicenceStatus | null | undefined): Tier {
     return isLicensed(status) ? 'paid' : 'free';
+}
+
+/**
+ * Tier with the evaluation window applied. Plugins that adopt the
+ * evaluation flow should gate premium paths on
+ * `hasPremiumAccess(status, evalState)` instead of `isLicensed(status)`:
+ * licensed installs and installs inside their evaluation window both
+ * get the full feature set; everyone else is 'free'.
+ */
+export function effectiveTierOf(
+    status: LicenceStatus | null | undefined,
+    evalState?: EvaluationState | null,
+): EffectiveTier {
+    if (isLicensed(status)) return 'paid';
+    if (evalState && evalState.active) return 'trial';
+    return 'free';
+}
+
+export function hasPremiumAccess(
+    status: LicenceStatus | null | undefined,
+    evalState?: EvaluationState | null,
+): boolean {
+    return effectiveTierOf(status, evalState) !== 'free';
 }
 
 /**
