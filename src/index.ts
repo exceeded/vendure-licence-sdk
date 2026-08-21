@@ -36,7 +36,7 @@ export {
 } from './security';
 export { startRetentionSweeper, RetentionOptions } from './retention';
 export { isLicensed, tierOf, Tier, EffectiveTier, effectiveTierOf, hasPremiumAccess, premiumFeatureError } from './tier-gate';
-export { EvaluationClient, EvaluationClientOptions, EvaluationState, evalInstanceId } from './evaluation';
+export { EvaluationClient, EvaluationClientOptions, EvaluationState, EvalStatsProvider, evalInstanceId } from './evaluation';
 export { Heartbeat, HeartbeatOptions, fingerprintPublicKey } from './heartbeat';
 export {
     classifyEmailEvent,

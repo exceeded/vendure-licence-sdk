@@ -38,6 +38,12 @@ export interface EvaluationState {
     source: 'server' | 'fallback';
 }
 
+/** Optional anonymous usage aggregates (numbers only) included with the
+ *  daily registration ping — e.g. {invitesSent: 34}. The licence server
+ *  uses them to personalise the reminder emails the admin opted into.
+ *  Never include personal data. */
+export type EvalStatsProvider = () => Promise<Record<string, number>> | Record<string, number>;
+
 export interface EvaluationClientOptions {
     /** Full npm package name, e.g. "@huloglobal/vendure-plugin-x". */
     packageName: string;
@@ -61,6 +67,7 @@ export class EvaluationClient {
     private state: EvaluationState = { active: true, daysRemaining: null, endsAt: null, source: 'fallback' };
     private timer: NodeJS.Timeout | null = null;
     private lastWarnDay: number | null = null;
+    private statsProvider: EvalStatsProvider | null = null;
 
     constructor(opts: EvaluationClientOptions) {
         this.opts = opts;
@@ -74,6 +81,12 @@ export class EvaluationClient {
      *  admin-UI "remind me" lead capture so server records join up). */
     getInstanceId(): string {
         return evalInstanceId();
+    }
+
+    /** Install the stats provider after boot (the client is created at
+     *  plugin init, before services exist). */
+    setStatsProvider(fn: EvalStatsProvider): void {
+        this.statsProvider = fn;
     }
 
     start(): void {
@@ -95,6 +108,10 @@ export class EvaluationClient {
         try {
             const controller = new AbortController();
             const t = setTimeout(() => controller.abort(), 8_000);
+            let stats: Record<string, number> | undefined;
+            if (this.statsProvider) {
+                try { stats = await this.statsProvider(); } catch { /* stats are best-effort */ }
+            }
             const resp = await fetch(url, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
@@ -103,6 +120,7 @@ export class EvaluationClient {
                     version: this.opts.packageVersion,
                     instanceId: evalInstanceId(),
                     ts: Math.floor(Date.now() / 1000),
+                    ...(stats ? { stats } : {}),
                 }),
                 signal: controller.signal,
             });
