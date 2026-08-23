@@ -38,6 +38,7 @@ export { startRetentionSweeper, RetentionOptions } from './retention';
 export { isLicensed, tierOf, Tier, EffectiveTier, effectiveTierOf, hasPremiumAccess, premiumFeatureError } from './tier-gate';
 export { EvaluationClient, EvaluationClientOptions, EvaluationState, EvalStatsProvider, evalInstanceId } from './evaluation';
 export { LicenceStore, SqlQueryFn } from './licence-store';
+export { performSelfUpdate, selfUpdateEnv, SelfUpdateEnv, SelfUpdateResult } from './self-update';
 export { Heartbeat, HeartbeatOptions, fingerprintPublicKey } from './heartbeat';
 export {
     classifyEmailEvent,
