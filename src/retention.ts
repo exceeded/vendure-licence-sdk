@@ -39,7 +39,9 @@ export interface RetentionOptions {
 export function startRetentionSweeper(input: {
     /** Run a raw SQL query; returns a Promise of any result. Plugins
      *  typically pass `() => connection.rawConnection`. */
-    getConnection: () => { query: (sql: string, params?: any[]) => Promise<any> } | null;
+    getConnection: () => {
+        query: (sql: string, params?: any[], opts?: { needAffected?: boolean }) => Promise<any>;
+    } | null;
     table: string;
     dateColumn?: string;
     options: RetentionOptions;
@@ -68,6 +70,7 @@ export function startRetentionSweeper(input: {
                 const res = await conn.query(
                     `DELETE FROM \`${input.table}\` WHERE \`${dateColumn}\` < DATE_SUB(NOW(), INTERVAL ? DAY)`,
                     [opts.days],
+                    { needAffected: true },
                 );
                 const affected = (res?.affectedRows ?? res?.[1] ?? 0) as number;
                 if (affected) {
@@ -83,6 +86,7 @@ export function startRetentionSweeper(input: {
                     const res = await conn.query(
                         `DELETE FROM \`${input.table}\` ORDER BY \`${dateColumn}\` ASC LIMIT ?`,
                         [over],
+                        { needAffected: true },
                     );
                     const affected = (res?.affectedRows ?? res?.[1] ?? 0) as number;
                     Logger.info(`[${label}] pruned ${affected} oldest row(s) — cap=${opts.maxRows}`, loggerCtx);

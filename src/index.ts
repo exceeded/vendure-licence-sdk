@@ -50,3 +50,5 @@ export {
     warnIfIncompatibleVendure,
     isVendureVersionCompatible,
 } from './vendure-compat';
+export { translateSql, createDbAdapter, adapterFor, dialectOf } from './sql-dialect';
+export type { SqlDialect, DbAdapter, TranslateOptions } from './sql-dialect';

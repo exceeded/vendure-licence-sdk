@@ -19,7 +19,11 @@
  * configured env key always wins.
  */
 
-export type SqlQueryFn = (sql: string, params?: any[]) => Promise<any>;
+export type SqlQueryFn = (
+    sql: string,
+    params?: any[],
+    opts?: { conflictColumns?: string[] },
+) => Promise<any>;
 
 const TABLE_DDL = `
     CREATE TABLE IF NOT EXISTS hulo_licence_store (
@@ -51,9 +55,10 @@ export class LicenceStore {
     /** Persist a key the caller has ALREADY verified. */
     async save(pluginId: string, licenceKey: string): Promise<void> {
         await this.query(
-            'INSERT INTO hulo_licence_store (pluginId, licenceKey) VALUES (?, ?) ' +
-            'ON DUPLICATE KEY UPDATE licenceKey = VALUES(licenceKey)',
-            [pluginId, licenceKey]);
+            'INSERT INTO hulo_licence_store (pluginId, licenceKey, updatedAt) VALUES (?, ?, NOW()) ' +
+            'ON DUPLICATE KEY UPDATE licenceKey = VALUES(licenceKey), updatedAt = NOW()',
+            [pluginId, licenceKey],
+            { conflictColumns: ['pluginId'] });
     }
 
     async clear(pluginId: string): Promise<void> {

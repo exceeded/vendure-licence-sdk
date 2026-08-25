@@ -4,6 +4,20 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] — 2026-08-25
+
+### Added
+- **PostgreSQL support.** New `sql-dialect` module: `createDbAdapter()` /
+  `adapterFor()` wrap a TypeORM connection and transparently translate the
+  plugins' MySQL-flavoured SQL for Postgres — placeholders (`?` → `$n`),
+  identifier quoting, upserts (`ON DUPLICATE KEY UPDATE` → `ON CONFLICT`),
+  `INSERT IGNORE`, `DATE_SUB`/`DATE_ADD`, `GROUP_CONCAT`, `SUBSTRING_INDEX`,
+  `IF()`, `TIMESTAMPDIFF`, DDL type mapping with inline-index extraction,
+  aggregate casts, `DELETE … ORDER BY … LIMIT` emulation, and camelCase
+  result-key restoration. MySQL/MariaDB installs are byte-identical
+  passthrough. Verified against PostgreSQL 17 with the full query corpus of
+  all five plugins.
+
 ## [0.6.0] — 2026-07-04
 
 ### Added
