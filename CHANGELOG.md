@@ -4,6 +4,17 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] — 2026-09-01
+
+### Added
+- **Master licences + hardware binding.** `verifyLicence` now accepts a
+  `pluginId: '*'` master licence that activates every HULO plugin, and an
+  optional `instanceId` claim that binds any licence to one machine's
+  stable fingerprint (the evaluation client's hostname|platform hash).
+  Master licences are only ever accepted with a hardware binding; a bound
+  key is inert on any other machine. Ordinary per-plugin keys are
+  unchanged.
+
 ## [0.10.0] — 2026-08-25
 
 ### Added

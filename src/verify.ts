@@ -1,5 +1,6 @@
 import { createVerify } from 'crypto';
 import { LicencePayload, LicenceStatus, VerifyLicenceOptions } from './types';
+import { evalInstanceId } from './evaluation';
 
 /**
  * Verify a HULO licence JWT. The JWT uses the `RS256` algorithm:
@@ -44,9 +45,30 @@ export function verifyLicence(opts: VerifyLicenceOptions): LicenceStatus {
     }
     if (!signatureValid) return badSignature(payload);
 
-    // Structural checks.
-    if (!payload.pluginId || payload.pluginId !== pluginId) {
+    // Structural checks. A master licence (`pluginId: '*'`) covers every
+    // HULO plugin — always minted with an `instanceId` hardware binding.
+    const isMaster = payload.pluginId === '*';
+    if (!payload.pluginId || (!isMaster && payload.pluginId !== pluginId)) {
         return pluginMismatch(payload);
+    }
+    // Hardware binding: when the licence carries an instanceId it must
+    // match this machine's stable fingerprint (same computation as the
+    // evaluation client) — the key is inert anywhere else.
+    if ((payload as any).instanceId) {
+        if ((payload as any).instanceId !== evalInstanceId()) {
+            return {
+                valid: false,
+                payload,
+                message: 'Licence is hardware-bound to a different machine.',
+            } as LicenceStatus;
+        }
+    } else if (isMaster) {
+        // A master key without a hardware binding is never accepted.
+        return {
+            valid: false,
+            payload,
+            message: 'Master licences must be hardware-bound (missing instanceId).',
+        } as LicenceStatus;
     }
     if (!Array.isArray(payload.allowedDomains)) return malformed();
 
