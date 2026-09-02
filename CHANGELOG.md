@@ -4,6 +4,11 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] — 2026-09-02
+
+### Added
+- **`PurchaseClaimClient`** — buy-from-admin with automatic licence installation. Creates a claim-tagged buy-page link (`instance` + `claim`), persists it in the shared `hulo_licence_claim` table, polls `POST /licence/claim` until the purchase completes, verifies and installs the key through the plugin's own `onLicence` hook, and re-checks daily so renewed subscription keys land automatically. Fail-soft throughout.
+
 ## [0.11.1] — 2026-09-02
 
 ### Changed
