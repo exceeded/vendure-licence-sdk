@@ -4,6 +4,11 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] — 2026-09-02
+
+### Changed
+- **Branding.** The bundled `hulo-global-logo.svg` now uses the inline HG monogram (H and G share cap height and baseline).
+
 ## [0.11.0] — 2026-09-01
 
 ### Added
