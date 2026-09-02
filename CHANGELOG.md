@@ -4,6 +4,12 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] — 2026-09-02
+
+### Added
+- **`PurchaseClaimClient.billingPortalUrl()`** — Stripe billing-portal link for the subscription behind an install's licence (ownership proven by the buy-from-admin claim or the signed key).
+- **`describeLicence()`** — admin-facing summary of a verified licence (plan, customer, expiry, trial end, master flag) for the "Licence & billing" card.
+
 ## [0.13.0] — 2026-09-02
 
 ### Changed

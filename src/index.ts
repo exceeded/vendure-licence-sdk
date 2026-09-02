@@ -39,6 +39,7 @@ export { isLicensed, tierOf, Tier, EffectiveTier, effectiveTierOf, hasPremiumAcc
 export { EvaluationClient, EvaluationClientOptions, EvaluationState, EvalStatsProvider, evalInstanceId } from './evaluation';
 export { LicenceStore, SqlQueryFn } from './licence-store';
 export { PurchaseClaimClient, PurchaseClaimOptions, PurchaseClaimStatus, PurchasePlan } from './purchase-claim';
+export { describeLicence, LicenceSummary } from './licence-info';
 export { performSelfUpdate, selfUpdateEnv, SelfUpdateEnv, SelfUpdateResult } from './self-update';
 export { Heartbeat, HeartbeatOptions, fingerprintPublicKey } from './heartbeat';
 export {

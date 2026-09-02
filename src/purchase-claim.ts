@@ -244,6 +244,33 @@ export class PurchaseClaimClient {
         if (this.timer) { clearInterval(this.timer); this.timer = null; }
     }
 
+    /** Stripe billing-portal link (update card, cancel, switch plan) for
+     *  the subscription behind this install's licence. Proof of ownership
+     *  is the claim (bought from this admin) or, for a pasted/env key, the
+     *  signed key itself. Returns null when neither is available or the
+     *  licence has no subscription (lifetime, master). */
+    async billingPortalUrl(fallbackKey?: string | null): Promise<string | null> {
+        const row = await this.loadRow();
+        const url = (this.opts.claimEndpoint || DEFAULT_CLAIM_ENDPOINT).replace(/\/claim$/, '/portal-link');
+        const body: Record<string, string> = { plugin: this.opts.packageName };
+        if (row?.installedAt) { body.instanceId = row.instanceId; body.claim = row.claimToken; }
+        else if (fallbackKey) body.key = fallbackKey;
+        else return null;
+        try {
+            const controller = new AbortController();
+            const t = setTimeout(() => controller.abort(), 8_000);
+            const resp = await fetch(url, {
+                method: 'POST', headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(body), signal: controller.signal,
+            });
+            clearTimeout(t);
+            const j: any = resp.ok ? await resp.json().catch(() => null) : null;
+            return typeof j?.url === 'string' && /^https:\/\//.test(j.url) ? j.url : null;
+        } catch {
+            return null;
+        }
+    }
+
     /** Forget the claim (admin deactivated the licence). */
     async clear(): Promise<void> {
         this.stop();
