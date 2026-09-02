@@ -4,6 +4,11 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] — 2026-09-02
+
+### Changed
+- **`EvaluationClient` is now fail-closed.** It starts inactive and only grants premium access on an explicit `eval` answer from the licence server. The 14-day trial is now a card-backed Stripe trial started from the plugin's admin page (which mints a real licence), so registration alone never unlocks premium features — including when the licence server is unreachable.
+
 ## [0.12.0] — 2026-09-02
 
 ### Added

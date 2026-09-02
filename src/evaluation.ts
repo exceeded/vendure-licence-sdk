@@ -64,7 +64,10 @@ export function evalInstanceId(): string {
 
 export class EvaluationClient {
     private readonly opts: EvaluationClientOptions;
-    private state: EvaluationState = { active: true, daysRemaining: null, endsAt: null, source: 'fallback' };
+    // Fail-closed: premium is only ever granted by an explicit 'eval'
+    // answer from the licence server (which, since the card-backed trial,
+    // it no longer gives — trials mint real licences instead).
+    private state: EvaluationState = { active: false, daysRemaining: null, endsAt: null, source: 'fallback' };
     private timer: NodeJS.Timeout | null = null;
     private lastWarnDay: number | null = null;
     private statsProvider: EvalStatsProvider | null = null;
@@ -138,7 +141,7 @@ export class EvaluationClient {
                 }
             }
         } catch {
-            // Unreachable → keep last known state (fail-open). Never throw.
+            // Unreachable → keep last known state. Never throw.
         }
         return this.state;
     }
