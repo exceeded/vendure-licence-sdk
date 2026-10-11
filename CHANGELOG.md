@@ -4,6 +4,15 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] — 2026-10-11
+
+### Fixed
+- `Heartbeat` reported `jti: "unlicensed"` forever when the key was activated
+  from the admin UI or installed by the purchase claim after boot. New
+  `setLicenceKey(key)` and the `licenceKeyProvider` option make it report the
+  key now in force (`currentJti()` exposes it), so the licence server keeps
+  the usage stats on the right record.
+
 ## [0.15.0] — 2026-10-11
 
 ### Added
@@ -151,6 +160,7 @@ this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.htm
   revocation polling), `LicenceStatus` object, `RevocationChecker`, plugin
   `init()` scaffolding.
 
+[0.15.1]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.15.1
 [0.15.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.15.0
 [0.6.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.6.0
 [0.5.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.5.0

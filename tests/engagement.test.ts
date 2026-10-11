@@ -144,4 +144,20 @@ describe('Heartbeat stats', () => {
         expect(body.stats).toEqual({ requestsBlocked: 13 });
         expect(body.jti).toBe('unlicensed');
     });
+    it('reports the key in force after admin activation and via a live provider', async () => {
+        const fetchMock = vi.fn(async () => ({ ok: true }));
+        (globalThis as any).fetch = fetchMock;
+        const jwt = (jti: string) => 'eyJ.' + Buffer.from(JSON.stringify({ jti })).toString('base64url') + '.sig';
+        let live: string | null = null;
+        const hb = new Heartbeat({ packageName: 'p', packageVersion: '1', publicKeyFingerprint: 'abc', licenceKeyProvider: () => live });
+        expect(hb.currentJti()).toBe('unlicensed');
+        hb.setLicenceKey(jwt('from-admin'));
+        expect(hb.currentJti()).toBe('from-admin');
+        live = jwt('live-one');
+        expect(hb.currentJti()).toBe('live-one');
+        await hb.pingNow();
+        expect(JSON.parse((fetchMock.mock.calls[0] as any)[1].body).jti).toBe('live-one');
+        live = null; hb.setLicenceKey(null);
+        expect(hb.currentJti()).toBe('unlicensed');
+    });
 });

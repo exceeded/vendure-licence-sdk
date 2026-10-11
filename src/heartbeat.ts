@@ -50,6 +50,11 @@ export interface HeartbeatOptions {
     endpoint?: string;
     /** Override the period. Default 24h. Minimum enforced 1h. */
     intervalMs?: number;
+    /** Live source of the current licence key — wins over `licenceKey`
+     *  when set, so a key activated from the admin UI (or installed by the
+     *  purchase claim) is reported under its real jti from the next ping.
+     *  Return null/undefined when unlicensed. */
+    licenceKeyProvider?: () => string | null | undefined;
     /** Optional anonymous usage aggregates (numbers only, e.g.
      *  {ordersHeld: 12}) sent with every ping. Licensed installs use this
      *  so the renewal and win-back emails can say what the plugin did;
@@ -94,6 +99,18 @@ export class Heartbeat {
         this.opts.statsProvider = fn;
     }
 
+    /** Point the heartbeat at the key now in force (admin activation,
+     *  purchase-claim install, deactivation → null). */
+    setLicenceKey(key: string | null | undefined): void {
+        this.opts.licenceKey = key || undefined;
+    }
+
+    /** The jti the next ping will report. */
+    currentJti(): string {
+        const live = this.opts.licenceKeyProvider ? this.opts.licenceKeyProvider() : undefined;
+        return this.extractJti(live || this.opts.licenceKey) || 'unlicensed';
+    }
+
     /** Exposed for tests; normally driven by the timer. */
     async pingNow(): Promise<void> { return this.ping(); }
 
@@ -103,7 +120,7 @@ export class Heartbeat {
         const fingerprint = createHash('sha256')
             .update(this.opts.packageName + '|' + this.opts.packageVersion + '|' + (this.opts.publicKeyFingerprint || '') + '|' + (this.opts.verifierFingerprint || ''))
             .digest('hex');
-        const jti = this.extractJti(this.opts.licenceKey) || 'unlicensed';
+        const jti = this.currentJti();
         let stats: Record<string, number> | undefined;
         if (this.opts.statsProvider) {
             try {
