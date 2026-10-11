@@ -50,6 +50,12 @@ export interface HeartbeatOptions {
     endpoint?: string;
     /** Override the period. Default 24h. Minimum enforced 1h. */
     intervalMs?: number;
+    /** Optional anonymous usage aggregates (numbers only, e.g.
+     *  {ordersHeld: 12}) sent with every ping. Licensed installs use this
+     *  so the renewal and win-back emails can say what the plugin did;
+     *  the evaluation client carries the same numbers before purchase.
+     *  Never include personal data. */
+    statsProvider?: () => Promise<Record<string, number>> | Record<string, number>;
 }
 
 const DEFAULT_ENDPOINT = process.env.HULO_LICENCE_HEARTBEAT_URL
@@ -83,6 +89,14 @@ export class Heartbeat {
         if (this.timer) { clearInterval(this.timer); this.timer = null; }
     }
 
+    /** Install (or replace) the usage-stats provider after boot. */
+    setStatsProvider(fn: HeartbeatOptions['statsProvider']): void {
+        this.opts.statsProvider = fn;
+    }
+
+    /** Exposed for tests; normally driven by the timer. */
+    async pingNow(): Promise<void> { return this.ping(); }
+
     private async ping(): Promise<void> {
         if (this.stopped) return;
         const url = this.opts.endpoint || DEFAULT_ENDPOINT;
@@ -90,6 +104,16 @@ export class Heartbeat {
             .update(this.opts.packageName + '|' + this.opts.packageVersion + '|' + (this.opts.publicKeyFingerprint || '') + '|' + (this.opts.verifierFingerprint || ''))
             .digest('hex');
         const jti = this.extractJti(this.opts.licenceKey) || 'unlicensed';
+        let stats: Record<string, number> | undefined;
+        if (this.opts.statsProvider) {
+            try {
+                const raw = await this.opts.statsProvider();
+                stats = {};
+                for (const [k, v] of Object.entries(raw || {}).slice(0, 12)) {
+                    if (typeof v === 'number' && isFinite(v) && /^[a-zA-Z0-9_]{1,40}$/.test(k)) stats[k] = Math.round(v);
+                }
+            } catch { stats = undefined; }
+        }
         const body = JSON.stringify({
             plugin: this.opts.packageName,
             version: this.opts.packageVersion,
@@ -97,6 +121,7 @@ export class Heartbeat {
             fingerprint,
             uptimeSec: Math.round((Date.now() - this.started) / 1000),
             ts: Math.floor(Date.now() / 1000),
+            ...(stats && Object.keys(stats).length ? { stats } : {}),
         });
         try {
             const controller = new AbortController();

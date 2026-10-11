@@ -1,6 +1,6 @@
 {
   "name": "@huloglobal/vendure-licence-sdk",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "Licence validation helpers for HULO Vendure plugins. JWT verification, revocation polling and an admin status check used by paid HULO plugins to confirm the host installation is licensed.",
   "license": "AGPL-3.0-or-later",
   "author": "Wayne Garrison <wayne@garrison.me.uk>",
@@ -29,7 +29,8 @@
   },
   "peerDependencies": {
     "@nestjs/common": ">=10.0.0",
-    "@vendure/core": ">=3.0.0"
+    "@vendure/core": ">=3.0.0",
+    "nodemailer": ">=6.0.0"
   },
   "devDependencies": {
     "@nestjs/common": "^10.0.0",
@@ -42,5 +43,10 @@
     "vendure-plugin",
     "licence",
     "license"
-  ]
+  ],
+  "peerDependenciesMeta": {
+    "nodemailer": {
+      "optional": true
+    }
+  }
 }

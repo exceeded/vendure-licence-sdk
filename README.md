@@ -146,3 +146,28 @@ keys can be re-sent from
 
 MIT for the runtime helpers in this package. The plugin code embedding
 it sells under a separate commercial licence.
+
+## Merchant engagement kit (0.15.0)
+
+Every HULO plugin ships a weekly "what the plugin did for you" report and a
+few lifecycle nudges built on these helpers:
+
+```ts
+import { PluginPrefs, WeeklyDigest, smtpTransportFromEnv, licenceLifecycleNotice } from '@huloglobal/vendure-licence-sdk';
+
+const prefs = new PluginPrefs(sql, 'vendure-plugin-geo-block');
+await prefs.ensureTable();
+const digest = new WeeklyDigest({
+    pluginId: 'vendure-plugin-geo-block', pluginName: 'Geo Block', prefs,
+    collect: async (from, to) => ({ stats: [...], tips: [...], tier, licence, adminUrl }),
+    send: (to, mail) => smtpTransportFromEnv()!.sendMail({ to, ...mail }),
+    defaultRecipient: () => describeLicence(status)?.customer ?? null,
+});
+if (processContext.isWorker) digest.start();   // Monday 08:00 local, once per install
+```
+
+`digest.settings()` / `updateSettings()` / `sendNow()` back the "Weekly
+report" card on the plugin's admin page. `licenceLifecycleNotice()` returns
+the sentence the admin banner shows in the last week of a trial or key.
+`Heartbeat.setStatsProvider()` keeps the same usage numbers flowing to the
+licence server after purchase.

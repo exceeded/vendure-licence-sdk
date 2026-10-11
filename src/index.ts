@@ -35,6 +35,11 @@ export {
     randomToken,
 } from './security';
 export { startRetentionSweeper, RetentionOptions } from './retention';
+export {
+    PluginPrefs, composeDigest, formatStat, licenceLifecycleNotice, smtpTransportFromEnv, WeeklyDigest,
+    DigestStat, DigestTip, DigestInput, DigestMail, DigestFormat, MailLike, MailTransport,
+    WeeklyDigestOptions, WeeklyDigestSettings,
+} from './engagement';
 export { isLicensed, tierOf, Tier, EffectiveTier, effectiveTierOf, hasPremiumAccess, premiumFeatureError } from './tier-gate';
 export { EvaluationClient, EvaluationClientOptions, EvaluationState, EvalStatsProvider, evalInstanceId } from './evaluation';
 export { LicenceStore, SqlQueryFn } from './licence-store';

@@ -4,6 +4,22 @@ All notable changes to `@huloglobal/vendure-licence-sdk` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] — 2026-10-11
+
+### Added
+- Merchant engagement kit (`src/engagement.ts`): `PluginPrefs` (one shared
+  `hulo_plugin_prefs` table for small per-plugin settings, with an atomic
+  compare-and-set), `composeDigest()` (the weekly "what the plugin did for
+  you" report, text + HTML, with week-over-week deltas, next-step tips and
+  the trial/free upsell block), `WeeklyDigest` (once-a-week scheduler that
+  is safe across worker replicas, `sendNow()` preview, settings API),
+  `smtpTransportFromEnv()` (pooled nodemailer transport from `SMTP_*`,
+  optional peer dependency) and `licenceLifecycleNotice()` (the one line to
+  show when a trial, evaluation or key is about to end).
+- `Heartbeat` accepts a `statsProvider` / `setStatsProvider()` so licensed
+  installs keep reporting anonymous usage aggregates after purchase — the
+  licence server uses them in renewal and win-back emails.
+
 ## [0.14.1] — 2026-09-02
 
 ### Changed
@@ -135,6 +151,7 @@ this project adheres to [semantic versioning](https://semver.org/spec/v2.0.0.htm
   revocation polling), `LicenceStatus` object, `RevocationChecker`, plugin
   `init()` scaffolding.
 
+[0.15.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.15.0
 [0.6.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.6.0
 [0.5.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.5.0
 [0.4.0]: https://github.com/exceeded/vendure-licence-sdk/releases/tag/v0.4.0
